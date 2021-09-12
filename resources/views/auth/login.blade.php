@@ -15,6 +15,9 @@
                                 <a href="login/github" class="btn btn-outline-secondary btn-lg btn-block">
                                     Login with Github
                                 </a>
+                                <a href="login/google" class="btn btn-outline-secondary btn-lg btn-block">
+                                    Login with Google
+                                </a>
                             </div>
                         </div>
                     </form>

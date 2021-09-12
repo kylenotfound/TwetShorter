@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Twet;
-use App\User;
+use App\Models\Twet;
+use App\Models\User;
 
 class TwetController extends Controller {
 
@@ -26,7 +26,6 @@ class TwetController extends Controller {
 
         $twet->fill($twetData);
         $twet->save();
-        $twet->refresh();
 
         return redirect()->route('twet', ['id' => $uniqueTwetid]);
 

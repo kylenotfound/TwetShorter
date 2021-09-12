@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\User;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -26,8 +26,17 @@ class LoginController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function redirectToProvider() {
+    public function redirectToGithubProvider() {
         return Socialite::driver('github')->redirect();
+    }
+
+    /**
+     * Redirect the user to the Google authentication page.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function redirectToGoogleProvider() {
+      return Socialite::driver('google')->redirect();
     }
 
     /**
@@ -35,7 +44,7 @@ class LoginController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function handleProviderCallback() {
+    public function handleGithubProviderCallback() {
         $githubUser = Socialite::driver('github')->user();
 
         $user = User::where('provider_id', $githubUser->getId())->first();
@@ -44,7 +53,8 @@ class LoginController extends Controller {
           $user = User::create([
             'email' => $githubUser->getEmail(),
             'name' => $githubUser->getName(),
-            'provider_id' => $githubUser->getId(),
+            'external_id' => $githubUser->getId(),
+            'user_source_type' => 'GITHUB'
           ]);
         }
 
@@ -53,4 +63,29 @@ class LoginController extends Controller {
 
         return redirect('dash');
     }
+
+    /**
+     * Obtain the user information from GitHub.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function handleGoogleProviderCallback() {
+      $googleUser = Socialite::driver('google')->user();
+
+      $user = User::where('external_id', $googleUser->getId())->first();
+
+      if (!$user) {
+        $user = User::create([
+          'email' => $googleUser->getEmail(),
+          'name' => $googleUser->getName(),
+          'external_id' => $googleUser->getId(),
+          'user_source_type' => 'GOOGLE'
+        ]);
+      }
+
+      // login the user
+      Auth::login($user, true);
+
+      return redirect('dash');
+  }
 }

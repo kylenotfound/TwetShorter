@@ -21,8 +21,11 @@ Auth::routes();
 
 Route::get('/dash', 'HomeController@index')->name('dash');
 
-Route::get('login/github', 'Auth\LoginController@redirectToProvider');
-Route::get('login/github/callback', 'Auth\LoginController@handleProviderCallback');
+Route::get('login/github', 'Auth\LoginController@redirectToGithubProvider');
+Route::get('login/github/callback', 'Auth\LoginController@handleGithubProviderCallback');
+
+Route::get('login/google', 'Auth\LoginController@redirectToGoogleProvider');
+Route::get('login/google/callback', 'Auth\LoginController@handleGoogleProviderCallback');
 
 Route::post('/twet/{id}', 'TwetController@store');
 Route::get('/twet/{id}', 'TwetController@show')->name('twet');

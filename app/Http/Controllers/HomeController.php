@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\User;
-use App\Twet;
+use App\Models\User;
+use App\Models\Twet;
+use Auth;
 
 class HomeController extends Controller {
     /**
@@ -16,13 +17,8 @@ class HomeController extends Controller {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index() {
-        $user = User::current();
+        $user = Auth::user();
         $userId = $user->getId();
 
         $twets = Twet::all()->where('user_id', '=', $userId);
