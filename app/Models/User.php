@@ -33,7 +33,7 @@ class User extends Authenticatable {
         return $this->name;
     }
 
-    public function sourceType() {
-        $this->hasOne(UserSourceType::class);
+    public function getSourceType() {
+        return $this->user_source_type;
     }
 }

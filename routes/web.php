@@ -27,5 +27,10 @@ Route::get('login/github/callback', 'Auth\LoginController@handleGithubProviderCa
 Route::get('login/google', 'Auth\LoginController@redirectToGoogleProvider');
 Route::get('login/google/callback', 'Auth\LoginController@handleGoogleProviderCallback');
 
+Route::get('login/twitter', 'Auth\LoginController@redirectToTwitterProvider');
+Route::get('login/twitter/callback', 'Auth\LoginController@handleTwitterProviderCallback');
+
+
+
 Route::post('/twet/{id}', 'TwetController@store');
 Route::get('/twet/{id}', 'TwetController@show')->name('twet');
