@@ -43,27 +43,14 @@ class LoginController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function handleGithubProviderCallback() {
-      $githubUser = Socialite::driver('github')->user();
-
-      $user = User::where('external_id', $githubUser->getId())->first();
       try{
-        if (!$user) {
-          $user = User::create([
-            'email' => $githubUser->getEmail(),
-            'name' => $githubUser->getName(),
-            'external_id' => $githubUser->getId(),
-            'user_source_type' => 'GITHUB'
-          ]);
-        }
-
-      // login the user
-      
-        Auth::login($user, true);
+        $githubUser = Socialite::driver('github')->user();
+        $authUser = $this->findOrCreateUser($githubUser, 'GITHUB');
+        Auth::login($authUser, true);
       } catch (Exception $e) {
-        return redirect('login')->withErrors(["errors" => "error"]);
+        return redirect('login')->withErrors(["errors" => "An account has already been created with the email address provided!"]);
       }
       
-
       return redirect('dash');
   }
 
@@ -73,22 +60,14 @@ class LoginController extends Controller {
    * @return \Illuminate\Http\Response
    */
   public function handleGoogleProviderCallback() {
-    $googleUser = Socialite::driver('google')->user();
-
-    $user = User::where('external_id', $googleUser->getId())->first();
-
-    if (!$user) {
-      $user = User::create([
-        'email' => $googleUser->getEmail(),
-        'name' => $googleUser->getName(),
-        'external_id' => $googleUser->getId(),
-        'user_source_type' => 'GOOGLE'
-      ]);
+    try{
+      $googleUser = Socialite::driver('google')->user();
+      $authUser = $this->findOrCreateUser($googleUser, 'GOOGLE');
+      Auth::login($authUser, true);
+    } catch (Exception $e) {
+      return redirect('login')->withErrors(["errors" => "An account has already been created with the email address provided!"]);
     }
-
-    // login the user
-    Auth::login($user, true);
-
+    
     return redirect('dash');
 }
 
@@ -98,23 +77,28 @@ class LoginController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function handleTwitterProviderCallback() {
-      $twitterUser = Socialite::driver('google')->user();
-
-      $user = User::where('external_id', $twitterUser->getId())->first();
-
-      if (!$user) {
-        $user = User::create([
-          'email' => $twitterUser->getEmail(),
-          'name' => $twitterUser->getName(),
-          'external_id' => $twitterUser->getId(),
-          'user_source_type' => 'TWITTER'
-        ]);
+      try{
+        $twitterUser = Socialite::driver('twitter')->user();
+        $authUser = $this->findOrCreateUser($twitterUser, 'TWITTER');
+        Auth::login($authUser, true);
+      } catch (Exception $e) {
+        return redirect('login')->withErrors(["errors" => "An account has already been created with the email address provided!"]);
       }
-
-      // login the user
-      Auth::login($user, true);
-
+      
       return redirect('dash');
+  }
+
+  public function findOrCreateUser ($socialUser, $type) {
+    if ($authUser = User::where('external_id', $socialUser->id)->first()) {
+      return $authUser;
+    }
+    
+    return User::create([
+      'email' => $socialUser->getEmail(),
+      'name' => $socialUser->getName(),
+      'external_id' => $socialUser->getId(),
+      'user_source_type' => $type
+    ]);
   }
 
 }
